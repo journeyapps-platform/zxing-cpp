@@ -13,7 +13,7 @@ compile_options['CXXFLAGS'] = ' '.join(flags)
 
 def all_files(dir, ext='.cpp', level=5):
 	files = []
-	for i in range(level):
+	for i in range(1, level):
 		files += Glob(dir + ('/*' * i) + ext) 
 	return files
 
@@ -29,7 +29,7 @@ zxing_files = all_files('core/src')
 zxing_include = ['core/src']
 zxing_libs = env.Library('zxing', source=zxing_files, CPPPATH=zxing_include, **compile_options)
 
-app_files = all_files('magick/src')
+app_files = ['magick/src/MagickBitmapSource.cpp', 'magick/src/main.cpp']
 app_executable = env.Program('zxing', app_files, CPPPATH=magick_include + zxing_include, LIBS=magick_libs + zxing_libs, **compile_options)
 
 test_files = all_files('core/tests/src')

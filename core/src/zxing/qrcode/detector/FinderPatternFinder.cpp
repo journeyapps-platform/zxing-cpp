@@ -35,6 +35,8 @@ class FurthestFromAverageComparator {
 private:
   const float averageModuleSize_;
 public:
+  FurthestFromAverageComparator() : averageModuleSize_(0) { }
+  
   FurthestFromAverageComparator(float averageModuleSize) :
     averageModuleSize_(averageModuleSize) {
   }
@@ -48,6 +50,8 @@ public:
 class CenterComparator {
   const float averageModuleSize_;
 public:
+  CenterComparator() : averageModuleSize_(0) {}
+  
   CenterComparator(float averageModuleSize) :
     averageModuleSize_(averageModuleSize) {
   }

@@ -22,6 +22,7 @@
 #include <zxing/oned/OneDResultPoint.h>
 #include <math.h>
 #include <limits.h>
+#include <algorithm>
 
 namespace zxing {
   namespace oned {
@@ -67,7 +68,7 @@ namespace zxing {
       Ref<BitArray> row(new BitArray(width));
       int middle = height >> 1;
       bool tryHarder = hints.getTryHarder();
-      int rowStep = (int)fmax(1, height >> (tryHarder ? 8 : 5));
+      int rowStep = std::max(1, height >> (tryHarder ? 8 : 5));
       int maxLines;
       if (tryHarder) {
         maxLines = height; // Look at the whole image, not just the center

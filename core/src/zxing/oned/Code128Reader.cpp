@@ -24,6 +24,7 @@
 #include <math.h>
 #include <string.h>
 #include <sstream>
+#include <algorithm>
 
 namespace zxing {
 	namespace oned {
@@ -178,7 +179,7 @@ namespace zxing {
 						}
 						if (bestMatch >= 0) {
 							// Look for whitespace before start pattern, >= 50% of width of start pattern
-							if (row->isRange(fmaxl(0, patternStart - (i - patternStart) / 2), patternStart,
+							if (row->isRange(std::max(0, patternStart - (i - patternStart) / 2), patternStart,
 							    false)) {
 								int* resultValue = new int[3];
 								resultValue[0] = patternStart;
@@ -257,7 +258,7 @@ namespace zxing {
         bool isNextShifted = false;
 
         std::string tmpResultString;
-        std::stringstream tmpResultSStr; // used if its Code 128C
+//        std::ostringstream tmpResultSStr; // used if its Code 128C
 
         int lastStart = startPatternInfo[0];
         int nextStart = startPatternInfo[1];
@@ -378,9 +379,8 @@ namespace zxing {
             case CODE_CODE_C:
             // the code read in this case is the number encoded directly
               if (code < 100) {
-                if (code < 10)
-                tmpResultSStr << '0';
-              tmpResultSStr << code;
+                  tmpResultString.append(1, (char)('0' + (code / 10)));
+				  tmpResultString.append(1, (char)('0' + (code % 10)));
               } else {
                 if (code != CODE_STOP) {
                   lastCharacterWasPrintable = false;
@@ -427,7 +427,7 @@ namespace zxing {
         while (nextStart < width && row->get(nextStart)) {
           nextStart++;
         }
-        if (!row->isRange(nextStart, fminl(width, nextStart + (nextStart - lastStart) / 2), false)) {
+        if (!row->isRange(nextStart, std::min(width, nextStart + (nextStart - lastStart) / 2), false)) {
           throw ReaderException("");
         }
 
@@ -438,8 +438,8 @@ namespace zxing {
           throw ReaderException("");
         }
 
-        if (codeSet == CODE_CODE_C)
-          tmpResultString.append(tmpResultSStr.str());
+//        if (codeSet == CODE_CODE_C)
+//          tmpResultString.append(tmpResultSStr.str());
 
         // Need to pull out the check digits from string
         int resultLength = tmpResultString.length();
@@ -447,9 +447,9 @@ namespace zxing {
         // be a printable character. If it was just interpreted as a control code, nothing to remove.
         if (resultLength > 0 && lastCharacterWasPrintable) {
           if (codeSet == CODE_CODE_C) {
-            tmpResultString.erase(resultLength - 2, resultLength);
+            tmpResultString.erase(resultLength - 2, 2);
           } else {
-            tmpResultString.erase(resultLength - 1, resultLength);
+            tmpResultString.erase(resultLength - 1, 1);
           }
         }
 
@@ -457,6 +457,16 @@ namespace zxing {
         if (tmpResultString.length() == 0) {
           // Almost surely a false positive
           throw ReaderException("");
+        }
+        
+        
+        int len = tmpResultString.length();
+        if(len >= 5) {
+        char c1 = tmpResultString[0];
+        char c2 = tmpResultString[1];
+        char c3 = tmpResultString[2];
+        char c4 = tmpResultString[3];
+        char c5 = tmpResultString[4];
         }
 
         float left = (float) (startPatternInfo[1] + startPatternInfo[0]) / 2.0f;
